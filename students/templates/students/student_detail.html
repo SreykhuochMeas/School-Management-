@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ student.name }} - Details</title>
+</head>
+<body>
+    <h1>Student Details</h1>
+    <p><strong>Name:</strong> {{ student.name }}</p>
+    <p><strong>Email:</strong> {{ student.email }}</p>
+    <p><strong>Age:</strong> {{ student.age }}</p>
+    <p><strong>Gender:</strong> {{ student.get_gender_display }}</p>
+    <p><strong>Date of Birth:</strong> {{ student.date_of_birth }}</p>
+    <p><strong>Score:</strong> {{ student.score }}</p>
+    <p><strong>Status:</strong> {% if student.is_active %}Active{% else %}Inactive{% endif %}</p>
+
+    <h3>Enrolled Courses:</h3>
+    <ul>
+        {% for course in student.courses.all %}
+            <li>{{ course.name }}</li>
+        {% empty %}
+            <li>No courses enrolled.</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'student_list' %}">Back to Student List</a>
+</body>
+</html>

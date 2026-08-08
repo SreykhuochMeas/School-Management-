@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ course.name }} - Details</title>
+</head>
+<body>
+    <h1>{{ course.name }}</h1>
+    <p><strong>Description:</strong> {{ course.description|default:"No description provided." }}</p>
+
+    <h3>Enrolled Students:</h3>
+    <ul>
+        {% for student in course.students.all %}
+            <li>{{ student.name }} ({{ student.email }})</li>
+        {% empty %}
+            <li>No students enrolled in this course yet.</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'course_list' %}">Back to Course List</a>
+</body>
+</html>

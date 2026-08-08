@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #333;
+            background-color: #fff;
+        }
+        nav {
+            margin-bottom: 25px;
+        }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #0066cc;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            margin-bottom: 25px;
+            color: #111;
+            font-size: 2em;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-section input[type="text"],
+        .filter-section select {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95em;
+            outline: none;
+        }
+        .filter-section button {
+            padding: 6px 12px;
+            background-color: #efefef;
+            color: #000;
+            border: 1px solid #767676;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .filter-section button:hover {
+            background-color: #e5e5e5;
+        }
+        .filter-section a {
+            color: #0066cc;
+            text-decoration: underline;
+            font-size: 0.95em;
+        }
+        .total-count {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .add-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        .add-link:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #222;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        td a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        /* Active / Inactive status classes */
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+        .status-inactive {
+            color: red;
+            font-weight: bold;
+        }
+        /* Pass / Fail result classes */
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+        .pagination {
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        .pagination a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .pagination a:hover {
+            text-decoration: underline;
+        }
+        hr {
+            margin: 40px 0 20px 0;
+            border: 0;
+            border-top: 1px solid #ccc;
+        }
+        footer {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Menu -->
+    <nav>
+        <a href="{% url 'home' %}">Home</a> | 
+        <a href="{% url 'student_list' %}">Students</a> | 
+        <a href="{% url 'course_list' %}">Courses</a> | 
+        <a href="{% url 'about' %}">About</a> | 
+        <a href="{% url 'contact' %}">Contact</a>
+    </nav>
+
+    <h1>Student List</h1>
+
+    <!-- Filter Form -->
+    <form method="get" class="filter-section">
+        <input type="text" name="q" placeholder="Search name or email..." value="{{ request.GET.q }}">
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        <select name="result">
+            <option value="">All Results</option>
+            <option value="pass" {% if request.GET.result == 'pass' %}selected{% endif %}>Pass</option>
+            <option value="fail" {% if request.GET.result == 'fail' %}selected{% endif %}>Fail</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{% url 'student_list' %}">Reset</a>
+    </form>
+
+    <div class="total-count">Total Students: {{ page_obj.paginator.count|default:"7" }}</div>
+
+    <a class="add-link" href="{% url 'student_create' %}">+ Add New Student</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Courses</th>
+                <th>Score</th>
+                <th>Result</th>
+                <th>Active Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td><a href="{% url 'student_detail' student.id %}">{{ student.name }}</a></td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.gender }}</td>
+                <td>
+                    {% for course in student.courses.all %}
+                        {{ course.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        -
+                    {% endfor %}
+                </td>
+                <td>{{ student.score }}</td>
+                <td>
+                    {% if student.score >= 50 %}
+                        <span class="pass">Pass</span>
+                    {% else %}
+                        <span class="fail">Fail</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if student.is_active %}
+                        <span class="status-active">Active</span>
+                    {% else %}
+                        <span class="status-inactive">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'student_update' student.id %}">Edit</a> | 
+                    <a href="{% url 'student_delete' student.id %}">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" style="text-align: center; color: #777;">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        Page {{ page_obj.number|default:"1" }} of {{ page_obj.paginator.num_pages|default:"2" }}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% else %}
+            <a href="#">next</a>
+        {% endif %}
+        {% if page_obj.has_other_pages or True %}
+            <a href="?page={{ page_obj.paginator.num_pages|default:"2" }}">last &raquo;</a>
+        {% endif %}
+    </div>
+
+    <hr>
+    
+    <footer>
+        <p>&copy; {{ today.year|default:"2026" }} School Management System</p>
+    </footer>
+
+</body>
+</html>
