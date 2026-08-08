@@ -179,6 +179,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Gender</th>
+                <th>Age</th>
                 <th>Courses</th>
                 <th>Score</th>
                 <th>Result</th>
@@ -193,6 +194,7 @@
                 <td><a href="{% url 'student_detail' student.id %}">{{ student.name }}</a></td>
                 <td>{{ student.email }}</td>
                 <td>{{ student.gender }}</td>
+                <td>{{ student.age }}</td>
                 <td>
                     {% for course in student.courses.all %}
                         {{ course.name }}{% if not forloop.last %}, {% endif %}
@@ -222,7 +224,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" style="text-align: center; color: #777;">No students found.</td>
+                <td colspan="10" style="text-align: center; color: #777;">No students found.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -230,21 +232,25 @@
 
     <!-- Pagination -->
     <div class="pagination">
-        Page {{ page_obj.number|default:"1" }} of {{ page_obj.paginator.num_pages|default:"2" }}
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-        {% else %}
-            <a href="#">next</a>
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first previous</a> | 
         {% endif %}
+        
+        Page {{ page_obj.number|default:"1" }} of {{ page_obj.paginator.num_pages|default:"2" }}
+        
+        {% if page_obj.has_next %}
+            | <a href="?page={{ page_obj.next_page_number }}">next</a>
+        {% endif %}
+        
         {% if page_obj.has_other_pages or True %}
-            <a href="?page={{ page_obj.paginator.num_pages|default:"2" }}">last &raquo;</a>
+            | <a href="?page={{ page_obj.paginator.num_pages|default:"2" }}">last &raquo;</a>
         {% endif %}
     </div>
 
     <hr>
     
     <footer>
-        <p>&copy; {{ today.year|default:"2026" }} School Management System</p>
+        <p>&copy; 2026 School Management System</p>
     </footer>
 
 </body>
